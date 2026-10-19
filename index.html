@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7f6f0">
+  <title>Pantry Sprite｜冰箱食材精靈</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #26372f;
+      --muted: #78847b;
+      --paper: #f7f6f0;
+      --card: #fffefa;
+      --green: #426b50;
+      --green-dark: #31543d;
+      --green-pale: #e8eee3;
+      --orange: #e8905b;
+      --line: #e9e9df;
+      --shadow: 0 14px 40px rgba(47, 62, 48, .075);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--paper); min-height: 100vh; }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    .page { width: min(1160px, calc(100% - 48px)); margin: 0 auto; }
+    .topbar { height: 76px; display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 800; letter-spacing: -.4px; }
+    .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 14px; color: #fff; background: var(--green); font-size: 20px; }
+    .brand small { display: block; color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: 1.7px; margin-top: 2px; }
+    .top-note { color: var(--muted); font-size: 13px; }
+    .hero { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; min-height: 270px; padding: 42px 62px; border-radius: 28px; color: white; background: #466b51; }
+    .hero::after { content: ""; position: absolute; width: 340px; height: 340px; border: 1px solid rgba(255,255,255,.12); border-radius: 50%; right: 96px; top: -130px; box-shadow: 0 0 0 34px rgba(255,255,255,.035), 0 0 0 68px rgba(255,255,255,.025); }
+    .hero-copy { position: relative; z-index: 1; max-width: 570px; }
+    .eyebrow { margin: 0 0 12px; color: #d5e2d2; font-size: 12px; letter-spacing: 2px; font-weight: 700; }
+    h1 { margin: 0; font-size: clamp(30px, 4vw, 45px); line-height: 1.25; letter-spacing: -.8px; }
+    .hero-copy > p:last-child { color: #e1e9df; line-height: 1.8; font-size: 15px; margin: 13px 0 0; }
+    .hero-art { position: relative; z-index: 1; display: grid; place-items: center; width: 164px; height: 164px; margin-right: 42px; border-radius: 50%; background: #f4d19c; font-size: 80px; box-shadow: 0 12px 30px rgba(31,47,33,.15); transform: rotate(5deg); }
+    .hero-art::after { content: "✦"; position: absolute; right: -18px; top: 5px; color: #f8d48e; font-size: 31px; }
+    main { padding: 28px 0 54px; }
+    .dashboard { display: grid; grid-template-columns: minmax(0, 1.13fr) minmax(350px, .87fr); gap: 22px; align-items: start; }
+    .panel { background: var(--card); border: 1px solid rgba(228,229,218,.8); border-radius: 22px; box-shadow: var(--shadow); }
+    .pantry-panel { padding: 26px 28px 24px; }
+    .section-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    h2 { margin: 0; font-size: 20px; letter-spacing: -.3px; }
+    .subheading { margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .count-badge { flex-shrink: 0; padding: 7px 11px; color: var(--green-dark); background: var(--green-pale); border-radius: 30px; font-size: 12px; font-weight: 700; }
+    .add-form { display: flex; gap: 9px; margin-top: 23px; }
+    .add-form input { min-width: 0; flex: 1; height: 46px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; outline: none; background: #fff; color: var(--ink); transition: border .2s, box-shadow .2s; }
+    .add-form input:focus, .search-input:focus { border-color: #7e9c80; box-shadow: 0 0 0 3px rgba(95,130,96,.12); }
+    .primary-button { border: 0; border-radius: 12px; padding: 0 17px; color: white; background: var(--green); font-weight: 700; cursor: pointer; transition: background .2s, transform .2s; }
+    .primary-button:hover { background: var(--green-dark); transform: translateY(-1px); }
+    .quick-label { margin: 19px 0 9px; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .5px; }
+    .quick-adds { display: flex; flex-wrap: wrap; gap: 7px; }
+    .quick-chip { border: 1px solid var(--line); border-radius: 30px; padding: 6px 10px; background: transparent; color: #657268; cursor: pointer; font-size: 12px; transition: all .18s; }
+    .quick-chip:hover { border-color: #aabca8; color: var(--green-dark); background: #f4f7f1; }
+    .divider { height: 1px; margin: 22px 0 17px; background: var(--line); }
+    .ingredient-list { display: flex; flex-wrap: wrap; gap: 9px; min-height: 50px; align-content: flex-start; }
+    .ingredient { display: inline-flex; align-items: center; gap: 8px; border: 1px solid #e7ebdf; border-radius: 12px; padding: 8px 9px 8px 11px; background: #f5f7f1; color: #405344; font-size: 13px; animation: appear .22s ease-out; }
+    .ingredient .food-emoji { font-size: 15px; }
+    .remove-item { display: grid; place-items: center; width: 19px; height: 19px; border: 0; border-radius: 50%; color: #899187; background: transparent; cursor: pointer; font-size: 17px; line-height: 1; }
+    .remove-item:hover { color: #b65343; background: #f4e6e1; }
+    .empty-pantry { width: 100%; padding: 11px 0; color: #929a91; text-align: center; font-size: 13px; }
+    .pantry-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 17px; color: #929a91; font-size: 11px; }
+    .text-button { padding: 4px 0; border: 0; color: #7e8d7c; background: transparent; cursor: pointer; font-size: 11px; }
+    .text-button:hover { color: #b65343; }
+    .recipe-panel { padding: 26px 27px 23px; }
+    .recipe-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .recipe-count { color: var(--muted); font-size: 12px; }
+    .filter-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 18px 0 13px; }
+    .filter-tabs { display: flex; padding: 3px; border-radius: 10px; background: #f1f2eb; }
+    .filter-tab { border: 0; border-radius: 8px; padding: 7px 10px; color: #788178; background: transparent; font-size: 11px; cursor: pointer; white-space: nowrap; }
+    .filter-tab.active { color: var(--green-dark); background: white; box-shadow: 0 1px 4px rgba(40,55,42,.09); font-weight: 700; }
+    .search-input { width: 126px; height: 34px; padding: 0 10px; border: 1px solid var(--line); border-radius: 9px; background: #fff; outline: 0; font-size: 11px; }
+    .recipe-list { display: grid; gap: 9px; }
+    .recipe-card { display: flex; align-items: center; gap: 12px; padding: 11px; border: 1px solid #efefe8; border-radius: 14px; cursor: pointer; transition: transform .18s, border-color .18s, box-shadow .18s; }
+    .recipe-card:hover { transform: translateY(-2px); border-color: #d3dfce; box-shadow: 0 5px 14px rgba(45,65,48,.07); }
+    .recipe-emoji { display: grid; place-items: center; flex: 0 0 48px; height: 48px; border-radius: 13px; background: #f5eee1; font-size: 27px; }
+    .recipe-info { flex: 1; min-width: 0; }
+    .recipe-info h3 { margin: 0; overflow: hidden; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+    .recipe-meta { margin-top: 5px; color: var(--muted); font-size: 11px; }
+    .match { flex-shrink: 0; min-width: 52px; padding: 6px 7px; border-radius: 9px; color: #547450; background: #edf3e9; text-align: center; font-size: 11px; font-weight: 800; }
+    .match.low { color: #a17b45; background: #f7f0e4; }
+    .match-label { display: block; margin-top: 2px; font-size: 9px; font-weight: 500; }
+    .no-recipes { padding: 24px 10px; border: 1px dashed #dfe3d8; border-radius: 14px; color: var(--muted); text-align: center; font-size: 13px; line-height: 1.7; }
+    .surprise-button { width: 100%; min-height: 44px; margin-top: 14px; border: 1px solid #dce5d7; border-radius: 12px; color: var(--green-dark); background: #f1f5ed; font-size: 13px; font-weight: 700; cursor: pointer; transition: background .2s; }
+    .surprise-button:hover { background: #e6eee1; }
+    .tips-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; margin-top: 22px; }
+    .tip { display: flex; align-items: center; gap: 11px; padding: 16px; border-radius: 16px; background: #eeefe7; }
+    .tip-icon { display: grid; flex: 0 0 36px; place-items: center; width: 36px; height: 36px; border-radius: 12px; background: #fffefa; font-size: 17px; }
+    .tip strong { display: block; font-size: 12px; }
+    .tip span:last-child { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; }
+    footer { display: flex; justify-content: space-between; gap: 16px; padding: 18px 0 26px; color: #929a91; font-size: 11px; }
+    .spec-link { padding: 0; border: 0; color: #637966; background: none; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+    .modal-backdrop { position: fixed; inset: 0; z-index: 5; display: grid; place-items: center; padding: 20px; background: rgba(31,42,34,.44); backdrop-filter: blur(3px); animation: appear .15s ease-out; }
+    .modal { width: min(500px, 100%); max-height: min(85vh, 700px); overflow-y: auto; padding: 27px; border-radius: 22px; background: var(--card); box-shadow: 0 20px 70px rgba(22,35,25,.2); }
+    .modal-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; }
+    .modal-top h2 { font-size: 23px; }
+    .close-button { display: grid; place-items: center; flex: 0 0 32px; width: 32px; height: 32px; border: 0; border-radius: 50%; background: #f0f1ea; font-size: 19px; cursor: pointer; }
+    .modal-emoji { margin: 17px 0; font-size: 48px; }
+    .modal p, .modal li { color: #627066; font-size: 13px; line-height: 1.8; }
+    .modal h3 { margin: 20px 0 8px; font-size: 14px; }
+    .modal ul, .modal ol { padding-left: 21px; }
+    .modal-match { display: inline-block; margin-top: 8px; padding: 6px 10px; border-radius: 20px; color: var(--green-dark); background: var(--green-pale); font-size: 11px; font-weight: 700; }
+    .spec-modal { width: min(680px, 100%); }
+    .spec-modal section { padding-top: 10px; }
+    .spec-modal h3 { margin: 15px 0 5px; color: var(--green-dark); }
+    .spec-modal ul { margin: 6px 0; }
+    .toast { position: fixed; z-index: 8; left: 50%; bottom: 26px; transform: translateX(-50%); padding: 11px 17px; border-radius: 12px; color: white; background: #304738; box-shadow: 0 8px 24px #25372e33; font-size: 13px; animation: appear .2s ease-out; }
+    @keyframes appear { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 820px) {
+      .hero { padding: 36px; min-height: 240px; }
+      .hero-art { width: 125px; height: 125px; margin-right: 10px; font-size: 62px; }
+      .dashboard { grid-template-columns: 1fr; }
+      .recipe-panel { min-height: 300px; }
+    }
+    @media (max-width: 560px) {
+      .page { width: min(100% - 28px, 480px); }
+      .topbar { height: 65px; }
+      .top-note { max-width: 120px; text-align: right; font-size: 11px; }
+      .hero { min-height: 225px; padding: 29px 23px; border-radius: 22px; }
+      .hero-copy { max-width: 75%; }
+      .hero-copy > p:last-child { font-size: 13px; }
+      .hero-art { position: absolute; right: 1px; bottom: 19px; width: 83px; height: 83px; margin: 0; font-size: 43px; }
+      .hero-art::after { right: -7px; top: -3px; font-size: 22px; }
+      main { padding-top: 17px; }
+      .pantry-panel, .recipe-panel { padding: 21px 18px; }
+      .tips-row { grid-template-columns: 1fr; gap: 8px; margin-top: 15px; }
+      .tip { padding: 12px 14px; }
+      .filter-row { align-items: flex-start; flex-direction: column; }
+      .filter-tabs { width: 100%; }
+      .filter-tab { flex: 1; }
+      .search-input { width: 100%; }
+      footer { align-items: flex-start; flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">✿</span><span>Pantry Sprite<small>YOUR LITTLE KITCHEN HELPER</small></span></div>
+      <div class="top-note">讓冰箱裡的食材，都有好去處 ♡</div>
+    </header>
+
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow">GOOD FOOD, LESS WASTE</p>
+        <h1 id="hero-title">今天的冰箱，<br>想變成什麼料理？</h1>
+        <p>放進手邊的食材，小精靈幫你找靈感。<br>少一點煩惱，多一點美味和不浪費。</p>
+      </div>
+      <div class="hero-art" aria-hidden="true">🥬</div>
+    </section>
+
+    <main>
+      <div class="dashboard">
+        <section class="panel pantry-panel" aria-labelledby="pantry-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="pantry-title">🧺 我的食材庫</h2>
+              <p class="subheading">先看看冰箱裡有什麼吧！點一下 × 就能移除食材。</p>
+            </div>
+            <span class="count-badge" id="ingredient-count">0 種食材</span>
+          </div>
+          <form class="add-form" id="add-form">
+            <input id="ingredient-input" type="text" maxlength="20" autocomplete="off" placeholder="輸入食材，例如：雞蛋" aria-label="輸入要新增的食材">
+            <button class="primary-button" type="submit">＋ 加入</button>
+          </form>
+          <p class="quick-label">快速加入常見食材</p>
+          <div class="quick-adds" id="quick-adds"></div>
+          <div class="divider"></div>
+          <div class="ingredient-list" id="ingredient-list" aria-live="polite"></div>
+          <div class="pantry-foot">
+            <span>食材只儲存在這台裝置的瀏覽器</span>
+            <button class="text-button" id="clear-pantry" type="button">清空食材</button>
+          </div>
+        </section>
+
+        <section class="panel recipe-panel" aria-labelledby="recipe-title">
+          <div class="recipe-head">
+            <div>
+              <h2 id="recipe-title">🍳 為你找到的料理</h2>
+              <p class="subheading">依照現有食材，看看今天能煮什麼。</p>
+            </div>
+            <span class="recipe-count" id="recipe-count"></span>
+          </div>
+          <div class="filter-row">
+            <div class="filter-tabs" role="group" aria-label="料理篩選">
+              <button class="filter-tab active" type="button" data-filter="all">全部靈感</button>
+              <button class="filter-tab" type="button" data-filter="match">食材最多</button>
+              <button class="filter-tab" type="button" data-filter="quick">15 分鐘</button>
+            </div>
+            <input class="search-input" id="recipe-search" type="search" placeholder="搜尋料理…" aria-label="搜尋料理">
+          </div>
+          <div class="recipe-list" id="recipe-list" aria-live="polite"></div>
+          <button class="surprise-button" id="surprise-button" type="button">✨ 幫我隨機挑一道</button>
+        </section>
+      </div>
+      <section class="tips-row" aria-label="使用小提示">
+        <div class="tip"><span class="tip-icon">🌿</span><div><strong>先用快到期的食材</strong><span>減少浪費，讓每份食物都被珍惜</span></div></div>
+        <div class="tip"><span class="tip-icon">⏱️</span><div><strong>平日晚餐也不慌張</strong><span>用「15 分鐘」篩選快速料理靈感</span></div></div>
+        <div class="tip"><span class="tip-icon">💾</span><div><strong>下次回來還記得</strong><span>食材清單會自動保存在這台裝置</span></div></div>
+      </section>
+    </main>
+    <footer>
+      <span>用一點點創意，煮出剛剛好的日常。Made with ♡</span>
+      <button class="spec-link" id="open-spec" type="button">查看作品規格</button>
+    </footer>
+  </div>
+  <div id="modal-root"></div>
+  <div id="toast-root" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      const STORAGE_KEY = "pantry-sprite-ingredients-v1";
+      const initialIngredients = ["雞蛋", "番茄", "洋蔥", "白飯", "青蔥"];
+      const quickIngredients = ["雞蛋", "番茄", "洋蔥", "豆腐", "雞胸肉", "白飯", "青蔥", "馬鈴薯"];
+      const ingredientEmoji = {
+        "雞蛋": "🥚", "番茄": "🍅", "洋蔥": "🧅", "白飯": "🍚", "青蔥": "🌱",
+        "豆腐": "🧈", "雞胸肉": "🍗", "馬鈴薯": "🥔", "蒜頭": "🧄", "高麗菜": "🥬",
+        "紅蘿蔔": "🥕", "香菇": "🍄", "鮭魚": "🐟", "義大利麵": "🍝", "起司": "🧀",
+        "牛奶": "🥛", "玉米": "🌽", "菠菜": "🥬", "豬肉": "🥩", "小黃瓜": "🥒",
+        "培根": "🥓", "蝦仁": "🦐", "烏龍麵": "🍜", "地瓜": "🍠", "香蕉": "🍌"
+      };
+      const recipes = [
+        { name: "番茄炒蛋", emoji: "🍅", time: 12, difficulty: "簡單", ingredients: ["番茄", "雞蛋", "青蔥"], pantry: ["蒜頭"], description: "酸甜番茄遇上滑嫩炒蛋，簡單又下飯的家常經典。", steps: ["番茄切塊、雞蛋打散，青蔥切花。", "熱鍋炒蛋至半熟，先盛起備用。", "番茄炒軟出汁後放回雞蛋，調味拌勻即可。"] },
+        { name: "蔥花蛋炒飯", emoji: "🍳", time: 10, difficulty: "簡單", ingredients: ["白飯", "雞蛋", "青蔥"], pantry: ["洋蔥"], description: "粒粒分明的蛋炒飯，冰箱剩飯的華麗變身！", steps: ["雞蛋打散，青蔥切花。", "熱鍋炒蛋，再加入白飯炒散。", "加鹽調味，撒上蔥花快速拌炒即可。"] },
+        { name: "家常洋蔥煎蛋", emoji: "🧅", time: 12, difficulty: "簡單", ingredients: ["雞蛋", "洋蔥"], pantry: ["青蔥"], description: "洋蔥炒出甜味，再和蛋液一起煎到金黃。", steps: ["洋蔥切絲，雞蛋加少許鹽打散。", "洋蔥炒至透明微焦，倒入蛋液。", "小火煎至定型翻面，兩面金黃即可。"] },
+        { name: "香煎豆腐", emoji: "🧈", time: 15, difficulty: "簡單", ingredients: ["豆腐", "青蔥"], pantry: ["蒜頭"], description: "外酥內嫩的豆腐，配上蔥蒜醬汁就很滿足。", steps: ["豆腐擦乾切厚片，青蔥切花。", "平底鍋少油煎豆腐，兩面金黃。", "加蒜末、醬油和少量水，撒蔥花收汁。"] },
+        { name: "蒜香奶油義大利麵", emoji: "🍝", time: 15, difficulty: "簡單", ingredients: ["義大利麵", "蒜頭"], pantry: ["起司", "牛奶"], description: "濃郁蒜香和奶油醬汁，快速端出療癒晚餐。", steps: ["義大利麵依包裝時間煮熟，保留一點煮麵水。", "蒜頭切片，用奶油小火炒香。", "加入牛奶、起司與麵條拌勻，必要時加煮麵水調整濃度。"] },
+        { name: "鮭魚蔬菜炒飯", emoji: "🐟", time: 15, difficulty: "簡單", ingredients: ["鮭魚", "白飯", "雞蛋"], pantry: ["青蔥", "紅蘿蔔"], description: "把冰箱蔬菜和鮭魚一起炒進飯裡，營養又方便。", steps: ["鮭魚煎熟後壓成小塊，紅蘿蔔切丁。", "炒蛋後加入紅蘿蔔與白飯炒散。", "拌入鮭魚和蔥花，簡單調味即可。"] },
+        { name: "暖心洋蔥雞湯", emoji: "🍲", time: 30, difficulty: "簡單", ingredients: ["雞胸肉", "洋蔥", "紅蘿蔔"], pantry: ["馬鈴薯"], description: "慢慢煮出洋蔥甜味的清爽雞湯，暖胃又暖心。", steps: ["雞胸肉、洋蔥、紅蘿蔔切塊。", "食材放入鍋中加水，煮滾後轉小火。", "煮約 25 分鐘至雞肉熟透，加入鹽調味。"] },
+        { name: "蒜香高麗菜", emoji: "🥬", time: 8, difficulty: "簡單", ingredients: ["高麗菜", "蒜頭"], pantry: ["紅蘿蔔"], description: "大火快炒鎖住清甜，五分鐘就能上桌的家常菜。", steps: ["高麗菜洗淨撕小片，蒜頭切末。", "熱鍋下油爆香蒜末，放入高麗菜大火快炒。", "加鹽和少許水，炒到喜歡的軟度即可。"] },
+        { name: "玉米起司蛋餅", emoji: "🌽", time: 10, difficulty: "簡單", ingredients: ["雞蛋", "玉米", "起司"], pantry: ["青蔥"], description: "玉米的甜加上融化起司，早餐或點心都適合。", steps: ["雞蛋打散，拌入玉米粒和蔥花。", "倒入平底鍋煎至半熟，放上起司。", "對折煎至起司融化即可享用。"] },
+        { name: "香菇菠菜蛋花湯", emoji: "🥣", time: 12, difficulty: "簡單", ingredients: ["香菇", "菠菜", "雞蛋"], pantry: ["青蔥"], description: "清爽暖胃的一碗湯，冰箱裡的青菜也有好去處。", steps: ["香菇切片，菠菜洗淨切段。", "水煮滾後放入香菇，煮軟後加入菠菜。", "轉小火淋入蛋液，調味後撒蔥花。"] },
+        { name: "馬鈴薯煎餅", emoji: "🥔", time: 15, difficulty: "簡單", ingredients: ["馬鈴薯", "雞蛋", "洋蔥"], pantry: ["起司"], description: "煎到外酥內綿的馬鈴薯餅，當正餐配菜也很棒。", steps: ["馬鈴薯刨絲、洋蔥切細絲，和蛋液拌勻。", "平底鍋加油，將混合物鋪平小火煎熟。", "翻面煎至兩面金黃，可加起司一起享用。"] },
+        { name: "鮮蝦烏龍麵", emoji: "🍜", time: 15, difficulty: "簡單", ingredients: ["蝦仁", "烏龍麵", "洋蔥"], pantry: ["高麗菜", "青蔥"], description: "一鍋完成的鮮甜烏龍麵，忙碌晚餐的好選擇。", steps: ["洋蔥切絲，蝦仁洗淨擦乾。", "炒香洋蔥後加入蝦仁炒至變色。", "加入烏龍麵和少許水、醬油，煮至入味即可。"] },
+        { name: "香蕉牛奶燕麥", emoji: "🍌", time: 5, difficulty: "簡單", ingredients: ["香蕉", "牛奶"], pantry: ["燕麥"], description: "不用開火的快速早餐，香甜滑順又有飽足感。", steps: ["香蕉切片放入碗中。", "倒入牛奶，加入燕麥。", "拌勻後靜置兩分鐘，喜歡冰涼口感可冷藏。"] }
+      ];
+
+      const $ = (selector) => document.querySelector(selector);
+      const listEl = $("#ingredient-list");
+      const recipeListEl = $("#recipe-list");
+      let activeFilter = "all";
+      let searchQuery = "";
+      let toastTimer;
+      let ingredients = loadIngredients();
+
+      function loadIngredients() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+          if (Array.isArray(saved)) return saved.filter((item) => typeof item === "string");
+        } catch (error) {
+          console.warn("無法讀取已儲存的食材清單。", error);
+        }
+        return [...initialIngredients];
+      }
+
+      function saveIngredients() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
+        } catch (error) {
+          console.error("無法儲存食材清單。", error);
+          showToast("儲存失敗，請檢查瀏覽器儲存空間");
+        }
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, (char) => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        })[char]);
+      }
+
+      function renderQuickAdds() {
+        $("#quick-adds").innerHTML = quickIngredients.map((name) => {
+          const added = ingredients.includes(name);
+          return `<button class="quick-chip" type="button" data-quick="${escapeHtml(name)}" ${added ? "disabled aria-label=\"" + escapeHtml(name) + "已在清單中\"" : ""}>${added ? "✓ " : "＋ "}${escapeHtml(name)}</button>`;
+        }).join("");
+        $("#quick-adds").querySelectorAll(".quick-chip:disabled").forEach((button) => {
+          button.style.opacity = ".5";
+          button.style.cursor = "default";
+        });
+      }
+
+      function renderIngredients() {
+        $("#ingredient-count").textContent = `${ingredients.length} 種食材`;
+        listEl.innerHTML = ingredients.length
+          ? ingredients.map((name, index) => `<span class="ingredient"><span class="food-emoji" aria-hidden="true">${ingredientEmoji[name] || "🥗"}</span>${escapeHtml(name)}<button class="remove-item" type="button" data-remove="${index}" aria-label="移除${escapeHtml(name)}">×</button></span>`).join("")
+          : `<div class="empty-pantry">食材庫空空的，先加入幾樣食材吧 🌱</div>`;
+        renderQuickAdds();
+        renderRecipes();
+      }
+
+      function recipeScore(recipe) {
+        const needed = [...recipe.ingredients, ...recipe.pantry];
+        const have = needed.filter((item) => ingredients.includes(item)).length;
+        return { have, total: needed.length, percent: Math.round((have / needed.length) * 100) };
+      }
+
+      function renderRecipes() {
+        let results = recipes.map((recipe) => ({ recipe, score: recipeScore(recipe) }));
+        if (activeFilter === "match") results.sort((a, b) => b.score.percent - a.score.percent || a.recipe.time - b.recipe.time);
+        if (activeFilter === "quick") results = results.filter(({ recipe }) => recipe.time <= 15).sort((a, b) => b.score.percent - a.score.percent || a.recipe.time - b.recipe.time);
+        if (searchQuery) results = results.filter(({ recipe }) => recipe.name.toLowerCase().includes(searchQuery.toLowerCase()));
+        $("#recipe-count").textContent = `${results.length} 道`;
+        recipeListEl.innerHTML = results.length ? results.slice(0, 5).map(({ recipe, score }) => `
+          <article class="recipe-card" tabindex="0" role="button" data-recipe="${escapeHtml(recipe.name)}" aria-label="查看${escapeHtml(recipe.name)}做法">
+            <div class="recipe-emoji" aria-hidden="true">${recipe.emoji}</div>
+            <div class="recipe-info"><h3>${escapeHtml(recipe.name)}</h3><div class="recipe-meta">⏱ ${recipe.time} 分鐘　·　${recipe.difficulty}</div></div>
+            <div class="match ${score.percent < 50 ? "low" : ""}">${score.percent}%<span class="match-label">食材符合</span></div>
+          </article>`).join("") : `<div class="no-recipes">${searchQuery ? "沒有找到這道料理，換個關鍵字試試？" : "目前沒有符合條件的料理。"}<br>可以加入食材，或切換其他篩選看看。</div>`;
+      }
+
+      function showToast(message) {
+        const root = $("#toast-root");
+        root.innerHTML = `<div class="toast" role="status">${escapeHtml(message)}</div>`;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => { root.innerHTML = ""; }, 2400);
+      }
+
+      function addIngredient(value) {
+        const name = value.trim();
+        if (!name) return;
+        if (ingredients.includes(name)) {
+          showToast(`${name}已經在食材庫裡囉！`);
+          return;
+        }
+        ingredients.push(name);
+        saveIngredients();
+        renderIngredients();
+        showToast(`已把${name}放進食材庫`);
+      }
+
+      function openRecipe(name) {
+        const recipe = recipes.find((item) => item.name === name);
+        if (!recipe) return;
+        const score = recipeScore(recipe);
+        const missing = [...recipe.ingredients, ...recipe.pantry].filter((item) => !ingredients.includes(item));
+        $("#modal-root").innerHTML = `<div class="modal-backdrop" data-backdrop><article class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+          <div class="modal-top"><div><h2 id="modal-title">${escapeHtml(recipe.name)}</h2><span class="modal-match">🥬 食材符合 ${score.percent}%　·　⏱ ${recipe.time} 分鐘</span></div><button class="close-button" type="button" aria-label="關閉">×</button></div>
+          <div class="modal-emoji" aria-hidden="true">${recipe.emoji}</div><p>${escapeHtml(recipe.description)}</p>
+          <h3>準備食材</h3><p>${[...recipe.ingredients, ...recipe.pantry].map((item) => `${ingredientEmoji[item] || "🥗"} ${escapeHtml(item)}${ingredients.includes(item) ? "" : "（待補）"}`).join("　")}</p>
+          ${missing.length ? `<p>還缺：${missing.map(escapeHtml).join("、")}</p>` : `<p>太好了！需要的食材都在你的清單裡 🎉</p>`}
+          <h3>簡單做法</h3><ol>${recipe.steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>
+        </article></div>`;
+      }
+
+      function openSpec() {
+        $("#modal-root").innerHTML = `<div class="modal-backdrop" data-backdrop><article class="modal spec-modal" role="dialog" aria-modal="true" aria-labelledby="spec-title">
+          <div class="modal-top"><div><p class="eyebrow" style="color:#718773;margin-bottom:6px">PROJECT SPECIFICATION</p><h2 id="spec-title">Pantry Sprite｜作品規格</h2></div><button class="close-button" type="button" aria-label="關閉">×</button></div>
+          <section><h3>作品目的</h3><p>協助使用者將現有食材轉化為料理靈感，減少「不知道要吃什麼」的煩惱，並鼓勵珍惜食物、減少浪費。</p>
+          <h3>目標使用者</h3><p>想快速規劃日常餐點、手邊食材有限，或希望善用冰箱剩餘食材的一般使用者。</p>
+          <h3>核心功能</h3><ul><li>新增、移除與清空食材；提供常見食材快速加入。</li><li>自動計算每道料理與現有食材的符合比例，並依比例排序。</li><li>提供全部、食材最多、15 分鐘篩選與料理名稱搜尋。</li><li>點選料理查看所需食材、缺少項目、烹調時間與步驟。</li><li>隨機挑選料理；食材清單自動保存在瀏覽器 localStorage。</li></ul>
+          <h3>操作流程</h3><p>在食材庫輸入或快速加入食材 → 瀏覽即時更新的料理清單 → 使用篩選或搜尋 → 點選料理查看做法，或請小精靈隨機推薦。</p>
+          <h3>介面與技術</h3><p>以繁體中文呈現，採用溫暖的蔬食色系及響應式排版，支援桌機與手機。作品為單一 index.html，CSS 與 JavaScript 內嵌，無外部套件或伺服器需求。食材資料只保存在使用者目前的瀏覽器，不會上傳。</p></section>
+        </article></div>`;
+      }
+
+      $("#add-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const input = $("#ingredient-input");
+        addIngredient(input.value);
+        input.value = "";
+        input.focus();
+      });
+      $("#quick-adds").addEventListener("click", (event) => {
+        const button = event.target.closest("[data-quick]");
+        if (button) addIngredient(button.dataset.quick);
+      });
+      listEl.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-remove]");
+        if (!button) return;
+        const removed = ingredients.splice(Number(button.dataset.remove), 1)[0];
+        saveIngredients();
+        renderIngredients();
+        showToast(`已移除${removed}`);
+      });
+      $("#clear-pantry").addEventListener("click", () => {
+        if (!ingredients.length) {
+          showToast("食材庫已經是空的囉");
+          return;
+        }
+        ingredients = [];
+        saveIngredients();
+        renderIngredients();
+        showToast("食材庫已清空");
+      });
+      $(".filter-tabs").addEventListener("click", (event) => {
+        const button = event.target.closest("[data-filter]");
+        if (!button) return;
+        activeFilter = button.dataset.filter;
+        $(".filter-tab.active").classList.remove("active");
+        button.classList.add("active");
+        renderRecipes();
+      });
+      $("#recipe-search").addEventListener("input", (event) => {
+        searchQuery = event.target.value.trim();
+        renderRecipes();
+      });
+      recipeListEl.addEventListener("click", (event) => {
+        const card = event.target.closest("[data-recipe]");
+        if (card) openRecipe(card.dataset.recipe);
+      });
+      recipeListEl.addEventListener("keydown", (event) => {
+        if ((event.key === "Enter" || event.key === " ") && event.target.matches("[data-recipe]")) {
+          event.preventDefault();
+          openRecipe(event.target.dataset.recipe);
+        }
+      });
+      $("#surprise-button").addEventListener("click", () => {
+        const recipe = recipes[Math.floor(Math.random() * recipes.length)];
+        openRecipe(recipe.name);
+      });
+      $("#open-spec").addEventListener("click", openSpec);
+      $("#modal-root").addEventListener("click", (event) => {
+        if (event.target.matches("[data-backdrop]") || event.target.closest(".close-button")) $("#modal-root").innerHTML = "";
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") $("#modal-root").innerHTML = "";
+      });
+      renderIngredients();
+    })();
+  </script>
+</body>
+</html>
